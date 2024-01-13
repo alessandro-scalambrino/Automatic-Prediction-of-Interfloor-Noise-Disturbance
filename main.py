@@ -7,7 +7,7 @@ from functions.func_plot import *
 
 
 
-excel_path = '../elenco_file_audio_backup.xlsx'
+excel_path = './elenco_file_audio_backup.xlsx'
 df = load_excel_data(excel_path)
 audio_folder = './dataset_rand'
 pazienti = ['paziente1', 'paziente2', 'paziente3', 'paziente4', 'paziente5', 'paziente6']

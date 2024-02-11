@@ -18,7 +18,8 @@ def plot_results(z_test, linear_pred, linearf_pred, y_test, knn_pred, knn_accura
                  tree_pred, tree_accuracy, treef_pred, treef_accuracy, svm_pred, svm_accuracy, svmf_pred,
                  svmf_accuracy, svm_linear_pred, svmf_linear_pred, svm_linear_accuracy, svmf_linear_accuracy,
                  svm_poly_pred, svmf_poly_pred, svm_poly_accuracy, svmf_poly_accuracy, svm_rbf_pred, svmf_rbf_pred,
-                 svm_rbf_accuracy, svmf_rbf_accuracy):
+                 svm_rbf_accuracy, svmf_rbf_accuracy, mse_linear, mae_linear, mse, mae, tree_reg_mse, tree_reg_mae, 
+                 svr_linear_mse, svr_linear_mae, svr_poly_mse, svr_poly_mae, svr_rbf_mse, svr_rbf_mae):
 
     # Grafici per regressione lineare
     plt.scatter(z_test, linear_pred, color='blue', label='Valori Attuali vs Predetti (Senza Normalizzazione)')
@@ -64,29 +65,52 @@ def plot_results(z_test, linear_pred, linearf_pred, y_test, knn_pred, knn_accura
     axes[2].set_xlabel('Predicted')
     axes[2].set_ylabel('Actual')
 
-    # Visualizzazione del diagramma
-    plt.show()
-
+    # Visualizzazione del diagramma per la classificazione
     plt.figure()
 
-    # Accuratezze dei modelli
-    accuracies = [knn_accuracy, tree_accuracy, svm_accuracy, knnf_accuracy, treef_accuracy, svmf_accuracy,
+    accuracies_classification = [knn_accuracy, knnf_accuracy, tree_accuracy,  treef_accuracy, svm_accuracy,  svmf_accuracy,
                   svm_linear_accuracy, svmf_linear_accuracy, svm_poly_accuracy, svmf_poly_accuracy,
                   svm_rbf_accuracy, svmf_rbf_accuracy]
 
-    # Nomi dei modelli
-    models = ['KNN', 'Decision Tree', 'SVM', 'KNN w/normalization', 'Decision Tree w/normalization',
-              'SVM w/normalization', 'SVM Linear', 'SVM Linear w/normalization', 'SVM Poly', 'SVM Poly w/normalization',
-              'SVM RBF', 'SVM RBF w/normalization']
+    models_classification = ['KNN', 'KNN w/n', 'Decision Tree', 'Decision Tree w/n', 'SVM', 
+                  'SVM w/n', 'SVM Lin', 'SVM Lin w/n', 'SVM Poly', 'SVM Poly w/n',
+                  'SVM RBF', 'SVM RBF w/n']
 
-    # Creazione del diagramma a barre
-    plt.bar(models, accuracies, color=['blue', 'green', 'red', 'blue', 'green', 'red', 'purple', 'orange', 'pink', 'brown', 'cyan', 'gray'])
+    # Definizione dei colori con diverse sfumature
+    colors = ['dodgerblue', 'dodgerblue', 'skyblue', 'skyblue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue']
+    alphas = [1.0, 0.7, 1.0, 0.7, 1.0, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2]
 
-    # Aggiunta di etichette e titolo
+    for model, accuracy, color, alpha in zip(models_classification, accuracies_classification, colors, alphas):
+        plt.bar(model, accuracy, color=color, alpha=alpha)
+
     plt.xlabel('Modelli')
     plt.ylabel('Accuratezza')
     plt.title('Accuratezza dei modelli di classificazione')
 
-    # Visualizzazione del diagramma
+    # Rotazione delle etichette sull'asse x in diagonale
+    plt.xticks(rotation=45, ha='right')
+
     plt.show()
 
+    # Visualizzazione del diagramma per la regressione
+    plt.figure()
+
+    accuracies_regression = [mse_linear, mae_linear, mse, mae, tree_reg_mse, tree_reg_mae, svr_linear_mse, svr_linear_mae, svr_poly_mse, svr_poly_mae, svr_rbf_mse, svr_rbf_mae]
+    models_regression = ['linear regression mse', 'linear regression mae', 'KNN mse', 'KNN mae','Decision Tree mse','Decision Tree mae', 'SVR lin mse', 'SVR lin mae', 'SVR poly mse', 'SVR poly mae', 'SVR gauss mse', 'SVR gauss mae']
+
+    # Definizione dei colori con diverse sfumature
+    colors = ['navy', 'navy', 'dodgerblue', 'dodgerblue', 'skyblue', 'skyblue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue']
+    alphas = [1.0, 0.7, 1.0, 0.7, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
+
+    # Disegna le barre con colori e sfumature diverse
+    for model, accuracy, color, alpha in zip(models_regression, accuracies_regression, colors, alphas):
+        plt.bar(model, accuracy, color=color, alpha=alpha)
+
+    plt.xlabel('Modelli')
+    plt.ylabel('Errore')
+    plt.title('Errore quadratico medio e assoluto dei modelli di regressione')
+
+    # Rotazione delle etichette sull'asse x in diagonale
+    plt.xticks(rotation=45, ha='right')
+
+    plt.show()

@@ -16,17 +16,17 @@ def create_dataframe(excel_path, audio_folder, df_media_voti):
         if file.lower().endswith('.wav') and os.path.isfile(file_path):
             file_name = os.path.basename(file_path)
             data['file'].append(file_name)
-            # Estrai la media dei voti corrispondente al file dalla tabella df_media_voti
+            # Estrae la media dei voti corrispondente al file dalla tabella df_media_voti
             file_label = df_media_voti[df_media_voti['File Audio'] == file]['Media_Voti'].values
             
-            # Assicurati che il file abbia una corrispondenza nella tabella df_media_voti
+            # empty check
             if len(file_label) > 0:
                 data['label'].append(file_label[0])
             else:
-                # Puoi gestire il caso in cui non ci sia una corrispondenza, ad esempio assegnando un valore di default
+                # assegna un valore di default
                 data['label'].append('valore_di_default')
 
-    # Crea e restituisci il DataFrame
+    # restituisce il DataFrame
     return pd.DataFrame(data)
 
 

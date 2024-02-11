@@ -17,61 +17,59 @@ def extract_category(filename):
     return match.group(1) if (match and match.group(1)) else ''
     
     # Funzione per k-statics
-def calculate_cohen_kappa_scores(df, pazienti):
+def calculate_cohen_kappa_scores(df, soggetti):
     kappa_scores = {}
     
-    for paziente1, paziente2 in combinations(pazienti, 2):
-        paziente1_scores = df[paziente1]
-        paziente2_scores = df[paziente2]
-        kappa_score = cohen_kappa_score(paziente1_scores, paziente2_scores)
-        kappa_scores[(paziente1, paziente2)] = kappa_score
+    for soggetto1, soggetto2 in combinations(soggetti, 2):
+        soggetto1_scores = df[soggetto1]
+        soggetto2_scores = df[soggetto2]
+        kappa_score = cohen_kappa_score(soggetto1_scores, soggetto2_scores)
+        kappa_scores[(soggetto1, soggetto2)] = kappa_score
     
     return kappa_scores
 
-def calculate_patient_statistics(df, pazienti):
-    media_per_paziente = df[pazienti].mean()
-    deviazione_standard_per_paziente = df[pazienti].std()
-    mediana_per_paziente = df[pazienti].median()
-    intervallo_per_paziente = df[pazienti].max() - df[pazienti].min()
-    kappa_scores = calculate_cohen_kappa_scores(df, pazienti)
-    return media_per_paziente, deviazione_standard_per_paziente, mediana_per_paziente, intervallo_per_paziente, kappa_scores
+def calculate_patient_statistics(df, soggetti):
+    media_per_soggetto = df[soggetti].mean()
+    deviazione_standard_per_soggetto = df[soggetti].std()
+    mediana_per_soggetto = df[soggetti].median()
+    intervallo_per_soggetto = df[soggetti].max() - df[soggetti].min()
+    kappa_scores = calculate_cohen_kappa_scores(df, soggetti)
+    return media_per_soggetto, deviazione_standard_per_soggetto, mediana_per_soggetto, intervallo_per_soggetto, kappa_scores
 
-def calculate_sound_statistics(df, pazienti):
-    df['media_suono'] = df[pazienti].mean(axis=1)
-    df['deviazione_standard_suono'] = df[pazienti].std(axis=1)
-    df['mediana_suono'] = df[pazienti].median(axis=1)
-    df['intervallo_suono'] = df[pazienti].max(axis=1) - df[pazienti].min(axis=1)
+def calculate_sound_statistics(df, soggetti):
+    df['media_suono'] = df[soggetti].mean(axis=1)
+    df['deviazione_standard_suono'] = df[soggetti].std(axis=1)
+    df['mediana_suono'] = df[soggetti].median(axis=1)
+    df['intervallo_suono'] = df[soggetti].max(axis=1) - df[soggetti].min(axis=1)
     return df
 
-def calculate_category_statistics(df, pazienti):
+def calculate_category_statistics(df, soggetti):
     df['categoria'] = df['File Audio'].apply(extract_category)
-    media_per_categoria = df.groupby('categoria')[pazienti].mean().reset_index()
-    devstd_per_categoria = df.groupby('categoria')[pazienti].std().reset_index()
-    mediana_per_categoria = df.groupby('categoria')[pazienti].median().reset_index()
-    intervallo_per_categoria = (df.groupby('categoria')[pazienti].max() - df.groupby('categoria')[pazienti].min()).reset_index()
+    media_per_categoria = df.groupby('categoria')[soggetti].mean().reset_index()
+    devstd_per_categoria = df.groupby('categoria')[soggetti].std().reset_index()
+    mediana_per_categoria = df.groupby('categoria')[soggetti].median().reset_index()
+    intervallo_per_categoria = (df.groupby('categoria')[soggetti].max() - df.groupby('categoria')[soggetti].min()).reset_index()
 
     categorie = {}
     for index, row in df.iterrows():
         categoria = row['categoria']
-        voto = row['paziente1']  # Sostituisci 'paziente1' con il nome reale della colonna dei voti
+        voto = row['soggetto1']  
         if categoria not in categorie:
-            categorie[categoria] = {paziente: [] for paziente in pazienti}
-        for paziente in pazienti:
-            categorie[categoria][paziente].append(row[paziente])
+            categorie[categoria] = {soggetto: [] for soggetto in soggetti}
+        for soggetto in soggetti:
+            categorie[categoria][soggetto].append(row[soggetto])
 
     return media_per_categoria, devstd_per_categoria, mediana_per_categoria, intervallo_per_categoria, categorie
 
 
-#stampa a schermo dei risultati
 
-
-def print_patient_statistics(pazienti, media, dev_std, mediana, intervallo):
-    paziente_table = pd.DataFrame({'Paziente': pazienti})
-    paziente_table['Media'] = media.values
-    paziente_table['Dev. Std.'] = dev_std.values
-    paziente_table['Mediana'] = mediana.values
-    paziente_table['Intervallo'] = intervallo.values
-    print(tabulate(paziente_table, headers='keys', tablefmt='grid', showindex=False))
+def print_patient_statistics(soggetti, media, dev_std, mediana, intervallo):
+    soggetto_table = pd.DataFrame({'Paziente': soggetti})
+    soggetto_table['Media'] = media.values
+    soggetto_table['Dev. Std.'] = dev_std.values
+    soggetto_table['Mediana'] = mediana.values
+    soggetto_table['Intervallo'] = intervallo.values
+    print(tabulate(soggetto_table, headers='keys', tablefmt='grid', showindex=False))
     print()
 
 def print_sound_statistics(df):
@@ -80,52 +78,48 @@ def print_sound_statistics(df):
     print(tabulate(concatenated_table, headers=suono_table.columns, tablefmt='grid', showindex=False))
     print()
 
-def print_category_statistics(media, dev_std, mediana, intervallo, categorie, pazienti):
+def print_category_statistics(media, dev_std, mediana, intervallo, categorie, soggetti):
     print("Media di disturbo per categoria e paziente:")
     table1 = []
-    for categoria, voti_per_paziente in categorie.items():
+    for categoria, voti_per_soggetto in categorie.items():
         row = [categoria]
-        for paziente in pazienti:
-            media_val = media.loc[media['categoria'] == categoria, paziente].values[0]
+        for soggetto in soggetti:
+            media_val = media.loc[media['categoria'] == categoria, soggetto].values[0]
             row.append(media_val)
         table1.append(row)
-    # Stampa la tabella
-    headers = ['Categoria'] + pazienti
+    headers = ['Categoria'] + soggetti
     print(tabulate(table1, headers=headers, tablefmt='grid'))
     print()
 
     print("Mediana di disturbo per categoria e paziente:")
     table2 = []
-    for categoria, voti_per_paziente in categorie.items():
+    for categoria, voti_per_soggetto in categorie.items():
         row = [categoria]
-        for paziente in pazienti:
-            mediana_val = mediana.loc[mediana['categoria'] == categoria, paziente].values[0]
+        for soggetto in soggetti:
+            mediana_val = mediana.loc[mediana['categoria'] == categoria, soggetto].values[0]
             row.append(mediana_val)
         table2.append(row)
-    # Stampa la tabella
     print(tabulate(table2, headers=headers, tablefmt='grid'))
     print()
 
     print("Deviazione standard di disturbo per categoria e paziente:")
     table3 = []
-    for categoria, voti_per_paziente in categorie.items():
+    for categoria, voti_per_soggetto in categorie.items():
         row = [categoria]
-        for paziente in pazienti:
-            dev_std_val = dev_std.loc[dev_std['categoria'] == categoria, paziente].values[0]
+        for soggetto in soggetti:
+            dev_std_val = dev_std.loc[dev_std['categoria'] == categoria, soggetto].values[0]
             row.append(dev_std_val)
         table3.append(row)
-    # Stampa la tabella
     print(tabulate(table3, headers=headers, tablefmt='grid'))
     print()
 
     print("Intervallo di disturbo per categoria e paziente:")
     table4 = []
-    for categoria, voti_per_paziente in categorie.items():
+    for categoria, voti_per_soggetto in categorie.items():
         row = [categoria]
-        for paziente in pazienti:
-            intervallo_val = intervallo.loc[intervallo['categoria'] == categoria, paziente].values[0]
+        for soggetto in soggetti:
+            intervallo_val = intervallo.loc[intervallo['categoria'] == categoria, soggetto].values[0]
             row.append(intervallo_val)
         table4.append(row)
-    # Stampa la tabella
     print(tabulate(table4, headers=headers, tablefmt='grid'))
     print()

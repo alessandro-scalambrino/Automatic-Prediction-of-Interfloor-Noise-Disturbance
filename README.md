@@ -13,3 +13,6 @@ The work on this project has continued and evolved into a scientific paper to be
 ## Usage
 1. Unzip the dataset
 2. Run the scripts in `/main.py` to train and evaluate the machine learning models.
+
+## Credits
+This project was developed by [Alessandro Scalambrino](https://github.com/alessandro-scalambrino)
